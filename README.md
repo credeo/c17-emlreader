@@ -7,34 +7,44 @@
 
 ## Features
 
--   **Browser & Node.js compatible** - Works in browsers, Web Workers, Node.js, and serverless environments
--   **TypeScript support** - Fully typed with comprehensive type definitions
--   **Zero dependencies** - No external dependencies
--   **RFC compliant** - Follows RFC 2822/5322 email standards
--   **Handles complex MIME structures** - Multipart messages, nested parts, attachments
--   **Security limits** - Built-in protection against deeply nested messages and oversized headers
+- **Browser & Node.js compatible** - Works in browsers, Web Workers, Node.js, and serverless environments
+- **TypeScript support** - Fully typed with comprehensive type definitions
+- **Zero dependencies** - No external dependencies
+- **RFC compliant** - Follows RFC 2822/5322 email standards
+- **Handles complex MIME structures** - Multipart messages, nested parts, attachments
+- **Security limits** - Built-in protection against deeply nested messages and oversized headers
 
 > [!NOTE]
 > Full documentation is available at [postal-mime.postalsys.com](https://postal-mime.postalsys.com/).
 
 ## Table of Contents
 
--   [Source](#source)
--   [Demo](#demo)
--   [Installation](#installation)
--   [Usage](#usage)
-    -   [Browser](#browser)
-    -   [Node.js](#nodejs)
-    -   [Cloudflare Email Workers](#cloudflare-email-workers)
--   [TypeScript Support](#typescript-support)
--   [API](#api)
-    -   [PostalMime.parse()](#postalmimeparse)
-    -   [Utility Functions](#utility-functions)
-        -   [addressParser()](#addressparser)
-        -   [decodeWords()](#decodewords)
--   [License](#license)
+- [Source](#source)
+- [Demo](#demo)
+- [Installation](#installation)
+- [Usage](#usage)
+    - [Browser](#browser)
+    - [Node.js](#nodejs)
+    - [Cloudflare Email Workers](#cloudflare-email-workers)
+- [TypeScript Support](#typescript-support)
+- [API](#api)
+    - [PostalMime.parse()](#postalmimeparse)
+    - [Utility Functions](#utility-functions)
+        - [addressParser()](#addressparser)
+        - [decodeWords()](#decodewords)
+- [License](#license)
 
 ---
+
+## Build for iOS (single minified JS file)
+
+To bundle the library into a single minified JavaScript file suitable for use in iOS (JavaScriptCore / WKWebView):
+
+```bash
+yarn build:ios
+```
+
+The output file will be located at `dist/emlreader.min.js`.
 
 ## Source
 
@@ -117,10 +127,13 @@ const options: PostalMimeOptions = {
     attachmentEncoding: 'base64'
 };
 
-const email: Email = await PostalMime.parse(`Subject: My awesome email 🤓
+const email: Email = await PostalMime.parse(
+    `Subject: My awesome email 🤓
 Content-Type: text/html; charset=utf-8
 
-<p>Hello world 😵‍💫</p>`, options);
+<p>Hello world 😵‍💫</p>`,
+    options
+);
 
 // Use 'util.inspect' for pretty-printing
 console.log(util.inspect(email, false, 22, true));
@@ -210,14 +223,14 @@ import type {
 
 ### Available Types
 
--   **`Email`** - The main parsed email object returned by `PostalMime.parse()`
--   **`Address`** - Union type representing either a `Mailbox` or an address group
--   **`Mailbox`** - Individual email address with name and address fields
--   **`Header`** - Email header with key and value
--   **`Attachment`** - Email attachment with metadata and content
--   **`PostalMimeOptions`** - Configuration options for parsing
--   **`AddressParserOptions`** - Configuration options for address parsing
--   **`RawEmail`** - Union type for all accepted email input formats
+- **`Email`** - The main parsed email object returned by `PostalMime.parse()`
+- **`Address`** - Union type representing either a `Mailbox` or an address group
+- **`Mailbox`** - Individual email address with name and address fields
+- **`Header`** - Email header with key and value
+- **`Attachment`** - Email attachment with metadata and content
+- **`PostalMimeOptions`** - Configuration options for parsing
+- **`AddressParserOptions`** - Configuration options for address parsing
+- **`RawEmail`** - Union type for all accepted email input formats
 
 ### Type Narrowing
 
@@ -246,58 +259,50 @@ if (email.from && isMailbox(email.from)) {
 PostalMime.parse(email, options) -> Promise<Email>
 ```
 
--   **email**: An RFC822 formatted email. This can be a `string`, `ArrayBuffer/Uint8Array`, `Blob`, `Buffer` (Node.js), or a [ReadableStream](https://developer.mozilla.org/en-US/docs/Web/API/ReadableStream).
--   **options**: Optional configuration object:
-    -   **rfc822Attachments** (boolean, default: `false`): Treat `message/rfc822` attachments without a Content-Disposition as attachments.
-    -   **forceRfc822Attachments** (boolean, default: `false`): Treat _all_ `message/rfc822` parts as attachments.
-    -   **attachmentEncoding** (string, default: `"arraybuffer"`): Determines how attachment content is decoded in the parsed email:
-        -   `"base64"`
-        -   `"utf8"`
-        -   `"arraybuffer"` (no decoding, returns `ArrayBuffer`)
-    -   **maxNestingDepth** (number, default: `256`): Maximum allowed MIME part nesting depth. Throws an error if exceeded.
-    -   **maxHeadersSize** (number, default: `2097152`): Maximum allowed total header size in bytes (default 2MB). Throws an error if exceeded.
+- **email**: An RFC822 formatted email. This can be a `string`, `ArrayBuffer/Uint8Array`, `Blob`, `Buffer` (Node.js), or a [ReadableStream](https://developer.mozilla.org/en-US/docs/Web/API/ReadableStream).
+- **options**: Optional configuration object:
+    - **rfc822Attachments** (boolean, default: `false`): Treat `message/rfc822` attachments without a Content-Disposition as attachments.
+    - **forceRfc822Attachments** (boolean, default: `false`): Treat _all_ `message/rfc822` parts as attachments.
+    - **attachmentEncoding** (string, default: `"arraybuffer"`): Determines how attachment content is decoded in the parsed email:
+        - `"base64"`
+        - `"utf8"`
+        - `"arraybuffer"` (no decoding, returns `ArrayBuffer`)
+    - **maxNestingDepth** (number, default: `256`): Maximum allowed MIME part nesting depth. Throws an error if exceeded.
+    - **maxHeadersSize** (number, default: `2097152`): Maximum allowed total header size in bytes (default 2MB). Throws an error if exceeded.
 
 > [!IMPORTANT]
 > The `maxNestingDepth` and `maxHeadersSize` options provide built-in security against malicious emails with deeply nested MIME structures or oversized headers that could cause performance issues or memory exhaustion.
 
 **Returns**: A Promise that resolves to a structured `Email` object with the following properties:
 
--   **headers**: An array of `Header` objects, each containing:
-    -   `key`: Lowercase header name (e.g., `"dkim-signature"`).
-    -   `value`: Unprocessed header value as a string.
--   **from**, **sender**: Processed `Address` objects (can be a `Mailbox` or address group):
-    -   `name`: Decoded display name, or an empty string if not set.
-    -   `address`: Email address.
-    -   `group`: Array of `Mailbox` objects (only for address groups).
--   **deliveredTo**, **returnPath**: Single email addresses as strings.
--   **to**, **cc**, **bcc**, **replyTo**: Arrays of `Address` objects (same structure as `from`).
--   **subject**: Subject line of the email.
--   **messageId**, **inReplyTo**, **references**: Values from their corresponding headers.
--   **date**: The email's sending time in ISO 8601 format (or the original string if parsing fails).
--   **html**: String containing the HTML content of the email.
--   **text**: String containing the plain text content of the email.
--   **attachments**: Array of `Attachment` objects:
-    -   `filename`: String or `null`
-    -   `mimeType`: String
-    -   `disposition`: `"attachment"`, `"inline"`, or `null`
-    -   `related`: Boolean (optional, `true` if it's an inline image)
-    -   `contentId`: String (optional)
-    -   `content`: `ArrayBuffer` or string, depending on `attachmentEncoding`
-    -   `encoding`: `"base64"` or `"utf8"` (optional)
+- **headers**: An array of `Header` objects, each containing:
+    - `key`: Lowercase header name (e.g., `"dkim-signature"`).
+    - `value`: Unprocessed header value as a string.
+- **from**, **sender**: Processed `Address` objects (can be a `Mailbox` or address group):
+    - `name`: Decoded display name, or an empty string if not set.
+    - `address`: Email address.
+    - `group`: Array of `Mailbox` objects (only for address groups).
+- **deliveredTo**, **returnPath**: Single email addresses as strings.
+- **to**, **cc**, **bcc**, **replyTo**: Arrays of `Address` objects (same structure as `from`).
+- **subject**: Subject line of the email.
+- **messageId**, **inReplyTo**, **references**: Values from their corresponding headers.
+- **date**: The email's sending time in ISO 8601 format (or the original string if parsing fails).
+- **html**: String containing the HTML content of the email.
+- **text**: String containing the plain text content of the email.
+- **attachments**: Array of `Attachment` objects:
+    - `filename`: String or `null`
+    - `mimeType`: String
+    - `disposition`: `"attachment"`, `"inline"`, or `null`
+    - `related`: Boolean (optional, `true` if it's an inline image)
+    - `contentId`: String (optional)
+    - `content`: `ArrayBuffer` or string, depending on `attachmentEncoding`
+    - `encoding`: `"base64"` or `"utf8"` (optional)
 
 <details>
 <summary><strong>TypeScript Types</strong></summary>
 
 ```typescript
-import type {
-    Email,
-    Address,
-    Mailbox,
-    Header,
-    Attachment,
-    PostalMimeOptions,
-    RawEmail
-} from 'postal-mime';
+import type { Email, Address, Mailbox, Header, Attachment, PostalMimeOptions, RawEmail } from 'postal-mime';
 
 // Main email parsing
 const email: Email = await PostalMime.parse(rawEmail);
@@ -350,9 +355,9 @@ import { addressParser } from 'postal-mime';
 addressParser(addressStr, opts) -> Address[]
 ```
 
--   **addressStr**: A raw address header string.
--   **opts**: Optional configuration:
-    -   **flatten** (boolean, default: `false`): If `true`, ignores address groups and returns a flat array of addresses.
+- **addressStr**: A raw address header string.
+- **opts**: Optional configuration:
+    - **flatten** (boolean, default: `false`): If `true`, ignores address groups and returns a flat array of addresses.
 
 **Returns**: An array of `Address` objects, which can be nested if address groups are present.
 
@@ -391,7 +396,7 @@ import { decodeWords } from 'postal-mime';
 decodeWords(encodedStr) -> string
 ```
 
--   **encodedStr**: A string that may contain MIME encoded-words.
+- **encodedStr**: A string that may contain MIME encoded-words.
 
 **Returns**: A Unicode string with all encoded-words decoded.
 

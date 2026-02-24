@@ -21,7 +21,8 @@
         "update": "rm -rf node_modules package-lock.json && ncu -u && npm install",
         "format": "prettier --write \"**/*.{js,mjs,json}\" --ignore-path .prettierignore",
         "format:check": "prettier --check \"**/*.{js,mjs,json}\" --ignore-path .prettierignore",
-        "prepublishOnly": "npm run build"
+        "prepublishOnly": "npm run build",
+        "build:ios": "node build-ios.mjs"
     },
     "keywords": [
         "mime",
